@@ -2,16 +2,21 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const userRouter = require("./routers/user_routes");
+const db = require("./models");
+
+// App config
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(cors({ origin: "*" }));
 
-const db = require("./models");
-const PORT = process.env.PORT || 8000;
+app.use("/api/v1/users", userRouter);
 
 /// Connect to database by using sequelize
+const PORT = process.env.PORT || 8000;
+
 async function assertDatabaseConnectionOk() {
   console.log("Checking database connection...");
   try {
