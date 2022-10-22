@@ -2,6 +2,7 @@ const models = require("../../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const jwt_decode = require("jwt-decode");
 
 const transporter = nodemailer.createTransport({
   service: "hotmail",
@@ -11,20 +12,16 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendConfirmationEmail = async ({ email, name }) => {
-  const emailToken = jwt.sign(
-    { data: { email, name } },
-    process.env.JWT_EMAIL_SECRET,
-    {
-      expiresIn: "1d",
-    }
-  );
+const sendConfirmationEmail = async (data) => {
+  const emailToken = jwt.sign({ data }, process.env.JWT_EMAIL_SECRET, {
+    expiresIn: "1d",
+  });
 
   const url = `${process.env.REACT_APP_FRONTEND_URL}/confirmation/${emailToken}`;
   try {
     await transporter.sendMail({
       from: `"Groceries Galore" <${process.env.EMAIL}>`, // sender address
-      to: email, // list of receivers
+      to: data.email, // list of receivers
       subject: "Groceries Galore: Confirm your email", // Subject line
       html: `Please click this link to confirm your email: <a href="${url}">${url}</a>`,
     });
@@ -38,10 +35,22 @@ const register = async (req, res) => {
   const { formData, userType } = req.body;
   const { name, email, password, confirmPassword, address, phoneNumber } =
     formData;
-  console.log("FORM DATA", formData);
   // TODO: validation
-  // 1) check for unique email and phone_number under customer and merchant
-  // 2) check that password and confirm_password is the same
+  const existingUser = await models[userType].findOne({
+    where: { email },
+  });
+
+  if (existingUser) {
+    return res.status(400).json({
+      error:
+        "There is an existing account with this email. Please log in instead.",
+    });
+  }
+  if (password !== confirmPassword) {
+    return res.status(400).json({
+      error: "Passwords do not match. Please try again!",
+    });
+  }
 
   // create user
   const passwordHash = await bcrypt.hash(password, 10);
@@ -53,11 +62,7 @@ const register = async (req, res) => {
     phoneNumber,
   };
   try {
-    if (userType === "Merchant") {
-      await models.Merchant.create(userDetails);
-    } else {
-      await models.Customer.create(userDetails);
-    }
+    await models[userType].create(userDetails);
   } catch (err) {
     return res
       .status(500)
@@ -65,7 +70,11 @@ const register = async (req, res) => {
   }
 
   // send confirmation email
-  const statusOfSentEmail = sendConfirmationEmail({ email, name });
+  const statusOfSentEmail = await sendConfirmationEmail({
+    email,
+    name,
+    userType,
+  });
   if (statusOfSentEmail === "success") {
     return res
       .status(201)
@@ -79,4 +88,24 @@ const register = async (req, res) => {
   }
 };
 
-module.exports = { sendConfirmationEmail, register };
+const confirm = async (req, res) => {
+  const emailToken = req.body.emailToken;
+  const { email, userType } = jwt_decode(emailToken).data;
+  try {
+    await models[userType].update(
+      { isConfirmed: true },
+      {
+        where: {
+          email,
+        },
+      }
+    );
+    return res.status(200).json({ success: "User successfully verified" });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "User confirmation failed. Error: " + err });
+  }
+};
+
+module.exports = { sendConfirmationEmail, register, confirm };
