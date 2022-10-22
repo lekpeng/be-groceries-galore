@@ -1,11 +1,10 @@
 {
   "development": {
-    "database": "groceries_galore",
+    "database": "groceries-galore",
     "host": "127.0.0.1",
     "dialect": "postgres",
-    "port": 5433,
-    "username": "lekpeng",
-    "password": "alisondarren"
+    "port": 5432,
+    "username": "lekpeng"
   },
   "test": {
     "username": "root",

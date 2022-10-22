@@ -35,10 +35,5 @@ module.exports = (sequelize) => {
     },
   });
 
-  // Merchant.associate = function (models) {
-  //   // associations can be defined here
-  //   Merchant.hasMany(models.Product);
-  //   Merchant.hasMany(models.Order);
-  // };
   return Merchant;
 };

@@ -21,11 +21,5 @@ module.exports = (sequelize) => {
     },
   });
 
-  // Order.associate = function (models) {
-  //   // associations can be defined here
-  //   Order.belongsTo(models.Customer);
-  //   Order.belongsTo(models.Merchant);
-  //   Order.hasMany(models.OrderDetail, { onDelete: "CASCADE" });
-  // };
   return Order;
 };

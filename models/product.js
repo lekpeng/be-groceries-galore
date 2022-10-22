@@ -33,12 +33,5 @@ module.exports = (sequelize) => {
     },
   });
 
-  // Product.associate = function (models) {
-  //   // associations can be defined here
-  //   Product.belongsTo(models.Merchant);
-  //   Product.belongsTo(models.Category);
-  //   Product.hasMany(models.OrderDetail);
-  // };
-
   return Product;
 };

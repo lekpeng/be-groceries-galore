@@ -9,10 +9,6 @@ module.exports = (sequelize) => {
     },
   });
 
-  // ProductCategory.associate = function (models) {
-  //   // associations can be defined here
-  //   ProductCategory.hasMany(models.Product);
-  // };
 
   return ProductCategory;
 };

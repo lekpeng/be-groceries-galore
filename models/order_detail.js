@@ -13,10 +13,6 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
     },
   });
-  // OrderDetail.associate = function (models) {
-  //   // associations can be defined here
-  //   OrderDetail.belongsTo(models.Product);
-  // };
 
   return OrderDetail;
 };
