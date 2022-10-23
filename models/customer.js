@@ -32,6 +32,9 @@ module.exports = (sequelize) => {
       allowNull: false,
       type: DataTypes.STRING,
     },
+    refreshToken: {
+      type: DataTypes.STRING,
+    },
   });
   return Customer;
 };
