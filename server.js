@@ -6,14 +6,18 @@ const cookieParser = require("cookie-parser");
 const userRouter = require("./routers/user_routes");
 const orderRouter = require("./routers/order_routes");
 const db = require("./models");
+const credentials = require("./middleware/credentials");
+const corsOptions = require("./config/corsOptions");
 
 // App config
 const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(credentials);
 app.use(cookieParser());
+
+app.use(cors(corsOptions));
 
 // Routes
 

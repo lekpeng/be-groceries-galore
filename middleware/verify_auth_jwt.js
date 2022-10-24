@@ -26,12 +26,12 @@ const verifyAuthJwt = (req, res, next) => {
   }
 
   // verify jwt (also checks expiry)
-  // TODO: need to differentiate if invalid due to wrong credentials or expired
   let decodedAccessToken = null;
   try {
     decodedAccessToken = jwt.verify(accessToken, process.env.JWT_AUTH_ACCESS_SECRET);
     req.user = decodedAccessToken.user;
   } catch (err) {
+    // in the front end, we will call refreshAccessToken from the token_controller
     return res.status(403).json({ error: "Invalid access token" });
   }
 

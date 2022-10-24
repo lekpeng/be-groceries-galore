@@ -9,13 +9,16 @@ const createEmailToken = (user) => {
 
 const createAccessToken = (user) => {
   return jwt.sign({ user }, process.env.JWT_AUTH_ACCESS_SECRET, {
-    expiresIn: "20s",
+    expiresIn: "15s",
   });
 };
 // use refresh token in cookie to get new access token
 const refreshAccessToken = async (req, res) => {
   const cookies = req.cookies;
+  console.log("COOKIES", cookies);
   const refreshToken = cookies?.jwtRefreshToken;
+
+  console.log("backend", refreshToken);
 
   if (!refreshToken) return res.status(401).json({ error: "No refresh token" });
 
@@ -24,7 +27,9 @@ const refreshAccessToken = async (req, res) => {
   try {
     decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_AUTH_REFRESH_SECRET);
   } catch (err) {
-    return res.status(403).json({ error: "Invalid access token" });
+    // in the front end, user will be logged out
+    res.clearCookie("jwtRefreshToken", { httpOnly: true, secure: true, sameSite: "None" });
+    return res.status(403).json({ error: "Invalid refresh token" });
   }
 
   // check whether there is user with matching refresh token
@@ -34,6 +39,8 @@ const refreshAccessToken = async (req, res) => {
   });
 
   if (!user) {
+    // remove token from cookie
+    res.clearCookie("jwtRefreshToken", { httpOnly: true, secure: true, sameSite: "None" });
     return res.status(403).json({
       error: "No user with matching refresh token.",
     });
@@ -41,8 +48,9 @@ const refreshAccessToken = async (req, res) => {
 
   // check whether the email of the user and the refresh token matches (tampering)
   if (user.email !== decodedRefreshToken.user.email) {
+    res.clearCookie("jwtRefreshToken", { httpOnly: true, secure: true, sameSite: "None" });
     return res.status(403).json({
-      error: "Invalid access token",
+      error: "Invalid refresh token",
     });
   }
 

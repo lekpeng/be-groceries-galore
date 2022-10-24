@@ -58,6 +58,7 @@ const confirm = async (req, res) => {
 };
 
 const register = async (req, res) => {
+  console.log("---> in register route");
   const { formData, userType } = req.body;
   const { name, email, password, confirmPassword, address, phoneNumber } = formData;
 
@@ -107,8 +108,6 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  console.log("IN LOGIN");
-  console.log("req.body", req.body);
   const { formData, userType } = req.body;
   const { email, password } = formData;
 
@@ -157,11 +156,54 @@ const login = async (req, res) => {
   try {
     // add refresh token to user in DB
     await user.update({ refreshToken });
-    res.cookie("jwtRefreshToken", refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+
+    res.cookie("jwtRefreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
     return res.status(200).json({ accessToken });
   } catch (err) {
     return res.status(500).json({ error: "User confirmation failed. Error: " + err });
   }
 };
 
-module.exports = { sendConfirmationEmail, confirm, register, login };
+const logout = async (req, res) => {
+  const cookies = req.cookies;
+  const refreshToken = cookies?.jwtRefreshToken;
+
+  if (!refreshToken) return res.status(204).json();
+
+  // remove refresh token
+  res.clearCookie("jwtRefreshToken", { httpOnly: true, secure: true, sameSite: "None" });
+  // verify refresh token (ignores expiry)
+  let decodedRefreshToken = null;
+  try {
+    decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_AUTH_REFRESH_SECRET, {
+      ignoreExpiration: true,
+    });
+  } catch (err) {
+    return res.status(204).json();
+  }
+
+  // check whether there is user with matching refresh token and delete entry in DB
+
+  const user = await models[decodedRefreshToken.user.userType].findOne({
+    where: { refreshToken },
+  });
+
+  if (user && user.email === decodedRefreshToken.user.email) {
+    await user.update({ refreshToken: null });
+  }
+
+  return res.status(204).json();
+};
+
+const customersOnly = async (req, res) => {
+  console.log("Running backend customers only route");
+  return res.status(200).json({ hey: "you are in customers only route" });
+};
+
+module.exports = { sendConfirmationEmail, confirm, register, login, logout, customersOnly };
