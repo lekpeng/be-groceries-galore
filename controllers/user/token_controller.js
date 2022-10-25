@@ -9,25 +9,29 @@ const createEmailToken = (user) => {
 
 const createAccessToken = (user) => {
   return jwt.sign({ user }, process.env.JWT_AUTH_ACCESS_SECRET, {
+    expiresIn: "10s",
+  });
+};
+
+const createRefreshToken = (user) => {
+  return jwt.sign({ user }, process.env.JWT_AUTH_REFRESH_SECRET, {
     expiresIn: "15s",
   });
 };
 // use refresh token in cookie to get new access token
 const refreshAccessToken = async (req, res) => {
   const cookies = req.cookies;
-  console.log("COOKIES", cookies);
   const refreshToken = cookies?.jwtRefreshToken;
-
-  console.log("backend", refreshToken);
 
   if (!refreshToken) return res.status(401).json({ error: "No refresh token" });
 
-  // verify refresh token (also checks expiry)
+  // verify refresh token
+
   let decodedRefreshToken = null;
+
   try {
     decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_AUTH_REFRESH_SECRET);
   } catch (err) {
-    // in the front end, user will be logged out
     res.clearCookie("jwtRefreshToken", { httpOnly: true, secure: true, sameSite: "None" });
     return res.status(403).json({ error: "Invalid refresh token" });
   }
@@ -58,10 +62,12 @@ const refreshAccessToken = async (req, res) => {
   const accessToken = createAccessToken({
     name: user.name,
     email: user.email,
-    userType: user.userType,
+    userType: decodedRefreshToken.user.userType,
   });
+
+  console.log("✅SUCCESSFUL REFRESH");
 
   return res.status(201).json({ accessToken });
 };
 
-module.exports = { createEmailToken, createAccessToken, refreshAccessToken };
+module.exports = { createEmailToken, createAccessToken, createRefreshToken, refreshAccessToken };

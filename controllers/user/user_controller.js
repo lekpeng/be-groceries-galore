@@ -2,7 +2,7 @@ const models = require("../../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-const { createAccessToken, createEmailToken } = require("./token_controller");
+const { createAccessToken, createEmailToken, createRefreshToken } = require("./token_controller");
 
 const transporter = nodemailer.createTransport({
   service: "hotmail",
@@ -58,7 +58,6 @@ const confirm = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  console.log("---> in register route");
   const { formData, userType } = req.body;
   const { name, email, password, confirmPassword, address, phoneNumber } = formData;
 
@@ -144,14 +143,7 @@ const login = async (req, res) => {
 
   // change to 10 min later
   const accessToken = createAccessToken({ name, email, userType });
-
-  const refreshToken = jwt.sign(
-    { user: { email, userType, name } },
-    process.env.JWT_AUTH_REFRESH_SECRET,
-    {
-      expiresIn: "1d",
-    }
-  );
+  const refreshToken = createRefreshToken({ name, email, userType });
 
   try {
     // add refresh token to user in DB
