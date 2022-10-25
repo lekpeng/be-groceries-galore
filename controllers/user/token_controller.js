@@ -65,8 +65,6 @@ const refreshAccessToken = async (req, res) => {
     userType: decodedRefreshToken.user.userType,
   });
 
-  console.log("✅SUCCESSFUL REFRESH");
-
   return res.status(201).json({ accessToken });
 };
 

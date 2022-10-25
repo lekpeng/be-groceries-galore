@@ -194,7 +194,6 @@ const logout = async (req, res) => {
 };
 
 const customersOnly = async (req, res) => {
-  console.log("Running backend customers only route");
   return res.status(200).json({ hey: "you are in customers only route" });
 };
 
