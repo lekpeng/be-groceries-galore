@@ -47,6 +47,11 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+      refreshToken: {
+        allowNull: false,
+        type: Sequelize.STRING,
+        defaultValue: "",
+      },
     });
   },
 

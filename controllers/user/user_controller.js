@@ -187,7 +187,7 @@ const logout = async (req, res) => {
   });
 
   if (user && user.email === decodedRefreshToken.user.email) {
-    await user.update({ refreshToken: null });
+    await user.update({ refreshToken: "" });
   }
 
   return res.status(204).json();
