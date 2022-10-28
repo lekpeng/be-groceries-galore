@@ -19,6 +19,10 @@ const controller = {
                   model: models.OrderDetail,
                   include: [{ model: models.Product }],
                 },
+                {
+                  model: models.Merchant,
+                  attributes: ["name"],
+                },
               ],
             },
           ],
@@ -39,6 +43,10 @@ const controller = {
                   model: models.OrderDetail,
                   include: [{ model: models.Product }],
                 },
+                {
+                  model: models.Merchant,
+                  attributes: ["name"],
+                },
               ],
             },
           ],
@@ -58,6 +66,10 @@ const controller = {
                 {
                   model: models.OrderDetail,
                   include: [{ model: models.Product }],
+                },
+                {
+                  model: models.Merchant,
+                  attributes: ["name"],
                 },
               ],
             },
