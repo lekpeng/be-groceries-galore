@@ -5,6 +5,8 @@ const models = require("../models");
 const userData = require("./seed_data/user_seed_data");
 const productCategoryData = require("./seed_data/product_category_seed_data");
 const productData = require("./seed_data/product_seed_data");
+const orderData = require("./seed_data/order_seed_data");
+const orderDetailData = require("./seed_data/order_detail_seed_data");
 
 const modelNames = ["Customer", "Merchant", "ProductCategory", "Product", "Order", "OrderDetail"];
 
@@ -44,11 +46,23 @@ const seedProducts = async () => {
   console.log("seeded products");
 };
 
+const seedOrders = async () => {
+  await models.Order.bulkCreate(orderData);
+  console.log("seeded orders");
+};
+
+const seedOrderDetails = async () => {
+  await models.OrderDetail.bulkCreate(orderDetailData);
+  console.log("seeded order details");
+};
+
 const seed = async (req, res) => {
   //   if (<no seeding done yet>){
   await seedUsers();
   await seedProductCategories();
   await seedProducts();
+  await seedOrders();
+  await seedOrderDetails();
   res.send("seeded!");
   //   }
   //   res.send("already seeded previously!");

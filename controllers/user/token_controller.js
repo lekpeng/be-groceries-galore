@@ -15,7 +15,7 @@ const createAccessToken = (user) => {
 
 const createRefreshToken = (user) => {
   return jwt.sign({ user }, process.env.JWT_AUTH_REFRESH_SECRET, {
-    expiresIn: "15s",
+    expiresIn: "1d",
   });
 };
 // use refresh token in cookie to get new access token

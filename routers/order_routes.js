@@ -4,7 +4,9 @@ const verifyAuthJwt = require("../middleware/verify_auth_jwt");
 const verifyUserType = require("../middleware/verify_user_type");
 
 // index
+// router.get("/", verifyAuthJwt, orderController.index);
 router.get("/", verifyAuthJwt, orderController.index);
+router.get("/cart", verifyAuthJwt, verifyUserType("Customer"), orderController.index);
 router.post("/new", verifyAuthJwt, verifyUserType("Customer"), orderController.create);
 
 module.exports = router;

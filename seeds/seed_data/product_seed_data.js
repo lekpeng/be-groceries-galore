@@ -59,6 +59,7 @@ const products = [
     MerchantId: 2,
     ProductCategoryId: 7,
   },
+
   {
     name: "Glico - Chocolate Pocky Stick",
     description: "47g",

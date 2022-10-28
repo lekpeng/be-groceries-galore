@@ -5,7 +5,7 @@ const controller = {
     const userType = req.params.userType;
     try {
       const users = await models[userType].findAll({
-        attributs: {
+        attributes: {
           exclude: ["passwordHash", "address", "phoneNumber"],
         },
       });

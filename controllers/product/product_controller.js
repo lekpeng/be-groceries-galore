@@ -20,6 +20,10 @@ const controller = {
     try {
       const product = await models.Product.findOne({
         where: { id: productId },
+        include: [
+          { model: models.Merchant, attributes: ["name"] },
+          { model: models.ProductCategory, attributes: ["name"] },
+        ],
       });
       if (!product) {
         return res.status(404).json({ error: "Product not found" });

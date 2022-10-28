@@ -10,6 +10,7 @@ const db = require("./models");
 
 const userRouter = require("./routers/user_routes");
 const orderRouter = require("./routers/order_routes");
+const orderDetailRouter = require("./routers/order_detail_routes");
 const productCategoryRouter = require("./routers/product_category_routes");
 const productRouter = require("./routers/product_routes");
 
