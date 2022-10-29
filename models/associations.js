@@ -1,4 +1,7 @@
 function applyAssociations(db) {
+  // on delete: set null and on update: cascade
+  // when an order is deleted, order details also get deleted
+
   const { Customer, Merchant, Order, OrderDetail, Product, ProductCategory } = db;
   Customer.hasMany(Order);
   Order.belongsTo(Customer);

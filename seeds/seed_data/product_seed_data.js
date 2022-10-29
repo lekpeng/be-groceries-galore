@@ -91,12 +91,12 @@ const products = [
     ProductCategoryId: 3,
   },
   {
-    name: "San Remo Pasta Spaghetti (No. 5",
+    name: "San Remo Pasta Spaghetti (No. 5)",
     description: "500g",
     price: 2.15,
     quantity: 100,
     imageUrl:
-      "https://res.cloudinary.com/groceries-galore/image/upload/v1666793387/products/shengsiong_-_apple_juice_aoyxi6.jpg",
+      "https://res.cloudinary.com/groceries-galore/image/upload/v1666793651/products/shengsiong_-_pasta_w8avv9.jpg",
     MerchantId: 3,
     ProductCategoryId: 10,
   },
