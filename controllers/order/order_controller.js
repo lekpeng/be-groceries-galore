@@ -1,3 +1,4 @@
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const models = require("../../models");
 
 const getCustomerWithCartInfo = async (email) => {
@@ -11,10 +12,14 @@ const getCustomerWithCartInfo = async (email) => {
         where: {
           isPaid: false,
         },
+        separate: true,
+        order: ["createdAt"],
         include: [
           {
             model: models.OrderDetail,
             include: [{ model: models.Product }],
+            separate: true,
+            order: ["createdAt"],
           },
           {
             model: models.Merchant,
@@ -108,9 +113,7 @@ const controller = {
     const { product, customerProductQuantity } = req.body;
 
     // check if there is an existing order with product's merchant
-    const existingOrderWithMerchant = cart?.find(
-      (order) => order.MerchantId === product.MerchantId
-    );
+    const existingOrderWithMerchant = cart?.find((order) => order.MerchantId === product.MerchantId);
     if (!existingOrderWithMerchant) {
       console.log("NO EXISTING ORDER");
       // create order and order detail
@@ -129,9 +132,7 @@ const controller = {
           ProductId: product.id,
         });
       } catch (err) {
-        return res
-          .status(500)
-          .json({ error: `Error adding item - no existing order with merchant in cart: ${err}` });
+        return res.status(500).json({ error: `Error adding item - no existing order with merchant in cart: ${err}` });
       }
     } else {
       // check if the product exists in the user's cart
@@ -198,16 +199,16 @@ const controller = {
           }
         );
       } catch (err) {
-        return res
-          .status(500)
-          .json({ error: `Error removing item - decrement quantity to non-zero: ${err}` });
+        return res.status(500).json({ error: `Error removing item - decrement quantity to non-zero: ${err}` });
       }
     } else {
       // check if customer has other items from same merchant in the cart
 
-      const existingOrderWithMerchant = cart?.find(
-        (order) => order.MerchantId === product.MerchantId
-      );
+      const existingOrderWithMerchant = cart?.find((order) => order.MerchantId === product.MerchantId);
+
+      if (!existingOrderWithMerchant) {
+        return res.status(200).json({ orders: customerWithCartInfo.Orders });
+      }
 
       if (
         existingOrderWithMerchant.OrderDetails.length === 1 &&
@@ -244,6 +245,28 @@ const controller = {
     const customerWithUpdatedCartInfo = await getCustomerWithCartInfo(req.user.email);
     return res.status(200).json({ orders: customerWithUpdatedCartInfo.Orders });
   },
+
+  createStripePaymentIntent: async (req, res) => {
+    const total = req.body.total;
+    let paymentIntent;
+
+    try {
+      paymentIntent = await stripe.paymentIntents.create({
+        amount: total,
+        currency: "sgd",
+      });
+    } catch (err) {
+      return res.status(502).json({
+        error: `Error creating stripe payment intent. ${err}`,
+      });
+    }
+
+    return res.status(201).json({
+      clientSecret: paymentIntent.client_secret,
+    });
+  },
+
+  updatePaymentStatus: async (req, res) => {},
 };
 
 module.exports = controller;
