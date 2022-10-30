@@ -32,6 +32,16 @@ const getCustomerWithCartInfo = async (email) => {
   return customer;
 };
 
+const getChangesNeededToProducts = (cart) => {
+  const changes = {};
+  for (const order of cart) {
+    for (const orderDetail of order.OrderDetails) {
+      changes[orderDetail.ProductId] = orderDetail.productQuantity;
+    }
+  }
+  return changes;
+};
+
 const getCustomerCart = async (email) => {
   const customerWithCartInfo = await getCustomerWithCartInfo(email);
   return customerWithCartInfo.Orders;
@@ -274,21 +284,41 @@ const controller = {
   },
 
   updatePaymentStatus: async (req, res) => {
-    // update payment status
-    // try {
-    //   await models.Order.update(
-    //     {
-    //       isPaid: true,
-    //     },
-    //     {
-    //       where: { isPaid: false,  },
-    //     }
-    //   );
-    // } catch (err) {
-    //   return res.status(500).json({
-    //     error: `Error adding item - existing product with merchant in cart: ${err}`,
-    //   });
-    // }
+    // get user cart
+    const cart = await getCustomerCart(req.user.email);
+    const changesNeededToProducts = getChangesNeededToProducts(cart);
+
+    try {
+      await Promise.all(
+        cart.map(async (order) => {
+          await order.update({ isPaid: true });
+        })
+      );
+    } catch (err) {
+      return res.status(500).json({
+        error: `Error updating payment status: ${err}`,
+      });
+    }
+
+    // reduce product quantity for items in cart
+    try {
+      const productIds = Object.keys(changesNeededToProducts);
+      await Promise.all(
+        productIds.map(async (productId) => {
+          const product = await models.Product.findOne({
+            where: { id: productId },
+          });
+          await product.decrement({
+            quantity: changesNeededToProducts[productId],
+          });
+        })
+      );
+    } catch (err) {
+      return res.status(500).json({
+        error: `Error updating product stock: ${err}`,
+      });
+    }
+    return res.status(200).json({});
   },
 };
 
