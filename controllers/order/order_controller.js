@@ -32,6 +32,11 @@ const getCustomerWithCartInfo = async (email) => {
   return customer;
 };
 
+const getCustomerCart = async (email) => {
+  const customerWithCartInfo = await getCustomerWithCartInfo(email);
+  return customerWithCartInfo.Orders;
+};
+
 const controller = {
   index: async (req, res) => {
     const { userType, email } = req.user;
@@ -109,7 +114,7 @@ const controller = {
   // },
   addItem: async (req, res) => {
     const customerWithCartInfo = await getCustomerWithCartInfo(req.user.email);
-    const cart = customerWithCartInfo.Orders;
+    const cart = await getCustomerCart(req.user.email);
     const { product, customerProductQuantity } = req.body;
 
     // check if there is an existing order with product's merchant
@@ -182,8 +187,16 @@ const controller = {
 
   removeItem: async (req, res) => {
     const { product, customerProductQuantity } = req.body;
-    const customerWithCartInfo = await getCustomerWithCartInfo(req.user.email);
-    const cart = customerWithCartInfo.Orders;
+    const cart = await getCustomerCart(req.user.email);
+    const existingOrderWithMerchant = cart?.find((order) => order.MerchantId === product.MerchantId);
+
+    if (!existingOrderWithMerchant) {
+      return res.status(200).json({ orders: cart });
+    }
+
+    const existingOrderDetail = existingOrderWithMerchant.OrderDetails.find(
+      (orderDetail) => orderDetail.ProductId === product.id
+    );
 
     // check if new quantity is 0
     if (customerProductQuantity > 0) {
@@ -195,7 +208,7 @@ const controller = {
             productQuantity: customerProductQuantity,
           },
           {
-            where: { ProductId: product.id },
+            where: { id: existingOrderDetail.id },
           }
         );
       } catch (err) {
@@ -203,12 +216,6 @@ const controller = {
       }
     } else {
       // check if customer has other items from same merchant in the cart
-
-      const existingOrderWithMerchant = cart?.find((order) => order.MerchantId === product.MerchantId);
-
-      if (!existingOrderWithMerchant) {
-        return res.status(200).json({ orders: customerWithCartInfo.Orders });
-      }
 
       if (
         existingOrderWithMerchant.OrderDetails.length === 1 &&
@@ -266,7 +273,23 @@ const controller = {
     });
   },
 
-  updatePaymentStatus: async (req, res) => {},
+  updatePaymentStatus: async (req, res) => {
+    // update payment status
+    // try {
+    //   await models.Order.update(
+    //     {
+    //       isPaid: true,
+    //     },
+    //     {
+    //       where: { isPaid: false,  },
+    //     }
+    //   );
+    // } catch (err) {
+    //   return res.status(500).json({
+    //     error: `Error adding item - existing product with merchant in cart: ${err}`,
+    //   });
+    // }
+  },
 };
 
 module.exports = controller;
