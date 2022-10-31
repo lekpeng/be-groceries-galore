@@ -84,6 +84,7 @@ const controller = {
           include: [
             {
               model: models.Order,
+              require: false,
               include: [
                 {
                   model: models.OrderDetail,
@@ -100,6 +101,8 @@ const controller = {
       } else if ("/cart" === req.url) {
         user = await getCustomerWithCartInfo(email);
       } else {
+        console.log("INSIDE ELSE");
+        console.log("USER TYPE", userType, email);
         user = await models[userType].findOne({
           where: {
             email,
@@ -110,6 +113,7 @@ const controller = {
               where: {
                 isPaid: true,
               },
+              required: false,
               include: [
                 {
                   model: models.OrderDetail,
@@ -124,6 +128,8 @@ const controller = {
           ],
         });
       }
+
+      console.log("USER IN ELSE", user);
 
       if (!user) {
         console.log("ERROR 404");
