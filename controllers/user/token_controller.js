@@ -9,7 +9,7 @@ const createEmailToken = (user) => {
 
 const createAccessToken = (user) => {
   return jwt.sign({ user }, process.env.JWT_AUTH_ACCESS_SECRET, {
-    expiresIn: "5h",
+    expiresIn: "5m",
   });
 };
 
@@ -20,6 +20,7 @@ const createRefreshToken = (user) => {
 };
 // use refresh token in cookie to get new access token
 const refreshAccessToken = async (req, res) => {
+  console.log("----> REFRESHING ACCESS TOKEN <-------");
   const cookies = req.cookies;
   const refreshToken = cookies?.jwtRefreshToken;
 
