@@ -32,6 +32,11 @@ const getCustomerWithCartInfo = async (email) => {
   return customer;
 };
 
+const getCustomerCart = async (email) => {
+  const customerWithCartInfo = await getCustomerWithCartInfo(email);
+  return customerWithCartInfo.Orders;
+};
+
 const getChangesNeededToProducts = (cart) => {
   const changes = {};
   for (const order of cart) {
@@ -42,9 +47,27 @@ const getChangesNeededToProducts = (cart) => {
   return changes;
 };
 
-const getCustomerCart = async (email) => {
-  const customerWithCartInfo = await getCustomerWithCartInfo(email);
-  return customerWithCartInfo.Orders;
+const updateOrderDetailsBasedOnStock = async (cart) => {
+  console.log("CALLING UPDATE ORDER DETAILS BOS");
+  const productsRemoved = [];
+  for (const order of cart) {
+    for (const orderDetail of order.OrderDetails) {
+      if (orderDetail.Product.quantity === 0) {
+        productsRemoved.push(orderDetail.Product);
+        await orderDetail.destroy();
+      }
+    }
+    const updatedOrder = await models.Order.findOne({
+      where: { id: order.id },
+      include: { model: models.OrderDetail },
+    });
+    if (updatedOrder.OrderDetails.length === 0) {
+      await updatedOrder.destroy();
+      console.log("DESTROYED ORDER");
+    }
+  }
+  console.log("ABOUT TO RETURN PRODUCTS REMOVED");
+  return productsRemoved;
 };
 
 const controller = {
@@ -147,7 +170,7 @@ const controller = {
           ProductId: product.id,
         });
       } catch (err) {
-        return res.status(500).json({ error: `Error adding item - no existing order with merchant in cart: ${err}` });
+        return res.status(500).json({ error: `Error adding item - no existing order with merchant in cart.` });
       }
     } else {
       // check if the product exists in the user's cart
@@ -169,7 +192,7 @@ const controller = {
           });
         } catch (err) {
           return res.status(500).json({
-            error: `Error adding item - no existing product but existing order with merchant in cart: ${err}`,
+            error: `Error adding item - no existing product but existing order with merchant in cart.`,
           });
         }
       } else {
@@ -186,7 +209,7 @@ const controller = {
           );
         } catch (err) {
           return res.status(500).json({
-            error: `Error adding item - existing product with merchant in cart: ${err}`,
+            error: `Error adding item - existing product with merchant in cart.`,
           });
         }
       }
@@ -222,7 +245,7 @@ const controller = {
           }
         );
       } catch (err) {
-        return res.status(500).json({ error: `Error removing item - decrement quantity to non-zero: ${err}` });
+        return res.status(500).json({ error: `Error removing item - decrement quantity to non-zero.` });
       }
     } else {
       // check if customer has other items from same merchant in the cart
@@ -242,7 +265,7 @@ const controller = {
           });
         } catch (err) {
           return res.status(500).json({
-            error: `Error removing item - no further product with merchant: ${err}`,
+            error: `Error removing item - no further product with merchant.`,
           });
         }
       } else {
@@ -254,13 +277,41 @@ const controller = {
           });
         } catch (err) {
           return res.status(500).json({
-            error: `Error removing item - existing other product with merchant in cart: ${err}`,
+            error: `Error removing item - existing other product with merchant in cart.`,
           });
         }
       }
     }
     const customerWithUpdatedCartInfo = await getCustomerWithCartInfo(req.user.email);
     return res.status(200).json({ orders: customerWithUpdatedCartInfo.Orders });
+  },
+
+  checkCart: async (req, res) => {
+    const cart = await getCustomerCart(req.user.email);
+    let removedProducts = [];
+
+    try {
+      console.log("-----IN FIRST TRY BLOCK------");
+
+      removedProducts = await updateOrderDetailsBasedOnStock(cart);
+      console.log("REMOVED PRODUCTS", removedProducts);
+      if (!removedProducts.length) {
+        return res.status(200).json({ cart, removedProducts });
+      }
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: `Failed to update order details based on stock.` });
+    }
+
+    try {
+      console.log("-----IN SECOND TRY BLOCK------");
+
+      const updatedCart = await getCustomerCart(req.user.email);
+      console.log("UPDATED CART", updatedCart);
+      return res.status(200).json({ cart: updatedCart, removedProducts });
+    } catch (err) {
+      return res.status(500).json({ error: `Failed to get updated cart.` });
+    }
   },
 
   createStripePaymentIntent: async (req, res) => {
@@ -274,7 +325,7 @@ const controller = {
       });
     } catch (err) {
       return res.status(502).json({
-        error: `Error creating stripe payment intent. ${err}`,
+        error: `Error creating stripe payment intent.`,
       });
     }
 
@@ -296,7 +347,7 @@ const controller = {
       );
     } catch (err) {
       return res.status(500).json({
-        error: `Error updating payment status: ${err}`,
+        error: `Error updating payment status.`,
       });
     }
 
@@ -315,7 +366,7 @@ const controller = {
       );
     } catch (err) {
       return res.status(500).json({
-        error: `Error updating product stock: ${err}`,
+        error: `Error updating product stock.`,
       });
     }
     return res.status(200).json({});
