@@ -6,6 +6,7 @@ const customers = [
     password: "harry1234",
     address: "4 Privet Drive, Little Whinging",
     phoneNumber: "11111111",
+    refreshToken: "",
   },
   {
     isConfirmed: true,
@@ -14,6 +15,7 @@ const customers = [
     password: "ronald1234",
     address: "The Burrow",
     phoneNumber: "22222222",
+    refreshToken: "",
   },
   {
     isConfirmed: true,
@@ -22,6 +24,7 @@ const customers = [
     password: "hermione1234",
     address: "The Burrow",
     phoneNumber: "33333333",
+    refreshToken: "",
   },
 
   {
@@ -31,6 +34,7 @@ const customers = [
     password: "draco1234",
     address: "Malfoy Manor",
     phoneNumber: "44444444",
+    refreshToken: "",
   },
   {
     isConfirmed: true,
@@ -39,6 +43,7 @@ const customers = [
     password: "severus1234",
     address: "Hogwarts",
     phoneNumber: "55555555",
+    refreshToken: "",
   },
 ];
 
@@ -50,6 +55,7 @@ const merchants = [
     password: "ntuc1234",
     address: "Serangoon",
     phoneNumber: "12121212",
+    refreshToken: "",
   },
   {
     isConfirmed: true,
@@ -58,6 +64,7 @@ const merchants = [
     password: "giant1234",
     address: "Tampines",
     phoneNumber: "34343434",
+    refreshToken: "",
   },
   {
     isConfirmed: true,
@@ -66,6 +73,7 @@ const merchants = [
     password: "shengsiong1234",
     address: "Ang Mo Kio",
     phoneNumber: "56565656",
+    refreshToken: "",
   },
 ];
 

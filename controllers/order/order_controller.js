@@ -101,8 +101,6 @@ const controller = {
       } else if ("/cart" === req.url) {
         user = await getCustomerWithCartInfo(email);
       } else {
-        console.log("INSIDE ELSE");
-        console.log("USER TYPE", userType, email);
         user = await models[userType].findOne({
           where: {
             email,
@@ -128,8 +126,6 @@ const controller = {
           ],
         });
       }
-
-      console.log("USER IN ELSE", user);
 
       if (!user) {
         console.log("ERROR 404");
@@ -302,7 +298,7 @@ const controller = {
       removedProducts = await updateOrderDetailsBasedOnStock(cart);
       console.log("REMOVED PRODUCTS", removedProducts);
       if (!removedProducts.length) {
-        return res.status(200).json({ cart, removedProducts });
+        return res.status(200).json({ updatedCart: cart, removedProducts });
       }
     } catch (err) {
       console.log(err);
@@ -314,7 +310,7 @@ const controller = {
 
       const updatedCart = await getCustomerCart(req.user.email);
       console.log("UPDATED CART", updatedCart);
-      return res.status(200).json({ cart: updatedCart, removedProducts });
+      return res.status(200).json({ updatedCart, removedProducts });
     } catch (err) {
       return res.status(500).json({ error: `Failed to get updated cart.` });
     }

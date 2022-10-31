@@ -40,7 +40,7 @@ const PORT = process.env.PORT || 8000;
 async function assertDatabaseConnectionOk() {
   console.log("Checking database connection...");
   try {
-    await db.sequelize.authenticate();
+    await db.sequelize.sync();
     console.log("Database connection OK!");
   } catch (error) {
     console.log("Unable to connect to the database:");
