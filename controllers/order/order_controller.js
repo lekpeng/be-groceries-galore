@@ -48,7 +48,6 @@ const getChangesNeededToProducts = (cart) => {
 };
 
 const updateOrderDetailsBasedOnStock = async (cart) => {
-  console.log("CALLING UPDATE ORDER DETAILS BOS");
   const productsRemoved = [];
   for (const order of cart) {
     for (const orderDetail of order.OrderDetails) {
@@ -63,10 +62,8 @@ const updateOrderDetailsBasedOnStock = async (cart) => {
     });
     if (updatedOrder.OrderDetails.length === 0) {
       await updatedOrder.destroy();
-      console.log("DESTROYED ORDER");
     }
   }
-  console.log("ABOUT TO RETURN PRODUCTS REMOVED");
   return productsRemoved;
 };
 
@@ -128,13 +125,12 @@ const controller = {
       }
 
       if (!user) {
-        console.log("ERROR 404");
         return res.status(404).json({ error: `${userType} with email ${email} not found` });
       }
 
       return res.status(200).json({ orders: user.Orders });
     } catch (err) {
-      return res.status(500).json({ error: err });
+      return res.status(500).json({ error: "Failed to get orders." });
     }
   },
 
@@ -155,7 +151,6 @@ const controller = {
     // check if there is an existing order with product's merchant
     const existingOrderWithMerchant = cart?.find((order) => order.MerchantId === product.MerchantId);
     if (!existingOrderWithMerchant) {
-      console.log("NO EXISTING ORDER");
       // create order and order detail
       try {
         const newOrder = await models.Order.create({
@@ -182,8 +177,6 @@ const controller = {
       const existingOrderDetailInOrder = getExistingOrderDetailInOrder(existingOrderWithMerchant);
 
       if (!existingOrderDetailInOrder) {
-        console.log("EXISTING ORDER BUT NOT EXISTING PRODUCT");
-
         // create order detail
         try {
           await models.OrderDetail.create({
@@ -198,7 +191,6 @@ const controller = {
           });
         }
       } else {
-        console.log("EXISTING PRODUCT");
         // update order detail
         try {
           await models.OrderDetail.update(
@@ -235,7 +227,6 @@ const controller = {
 
     // check if new quantity is 0
     if (customerProductQuantity > 0) {
-      console.log("DECREMENT QUANTITY");
       // update order detail
       try {
         await models.OrderDetail.update(
@@ -256,8 +247,6 @@ const controller = {
         existingOrderWithMerchant.OrderDetails.length === 1 &&
         existingOrderWithMerchant.OrderDetails[0].ProductId === product.id
       ) {
-        console.log("DELETE ORDER AND ORDER DETAIL");
-
         // delete order which cascades delete order detail
         try {
           await models.Order.destroy({
@@ -293,15 +282,11 @@ const controller = {
     let removedProducts = [];
 
     try {
-      console.log("-----IN FIRST TRY BLOCK------");
-
       removedProducts = await updateOrderDetailsBasedOnStock(cart);
-      console.log("REMOVED PRODUCTS", removedProducts);
       if (!removedProducts.length) {
         return res.status(200).json({ updatedCart: cart, removedProducts });
       }
     } catch (err) {
-      console.log(err);
       return res.status(500).json({ error: `Failed to update order details based on stock.` });
     }
 
@@ -309,7 +294,6 @@ const controller = {
       console.log("-----IN SECOND TRY BLOCK------");
 
       const updatedCart = await getCustomerCart(req.user.email);
-      console.log("UPDATED CART", updatedCart);
       return res.status(200).json({ updatedCart, removedProducts });
     } catch (err) {
       return res.status(500).json({ error: `Failed to get updated cart.` });

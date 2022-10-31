@@ -1,6 +1,5 @@
 const { Sequelize } = require("sequelize");
 const env = process.env.NODE_ENV || "development";
-console.log("ENV", env);
 
 const db = {};
 const { applyAssociations } = require("./associations");
@@ -10,7 +9,6 @@ if (process.env.DATABASE_URL) {
   sequelize = new Sequelize(process.env.DATABASE_URL);
 } else {
   const config = require(__dirname + "/../config/config")[env];
-  console.log("CONFIG", config);
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 

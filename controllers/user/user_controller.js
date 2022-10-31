@@ -88,7 +88,7 @@ const register = async (req, res) => {
   try {
     await models[userType].create(userDetails);
   } catch (err) {
-    return res.status(500).json({ error: "User not added to DB. Error: " + err });
+    return res.status(500).json({ error: "Failed to add user to DB" });
   }
 
   // send confirmation email
@@ -110,9 +110,7 @@ const login = async (req, res) => {
   const { formData, userType } = req.body;
   const { email, password } = formData;
 
-  let errorMsg = `Email or password is incorrect. Did you mean to login as a ${otherUserType(
-    userType
-  )} user?`;
+  let errorMsg = `Email or password is incorrect. Did you mean to login as a ${otherUserType(userType)} user?`;
 
   const user = await models[userType].findOne({
     where: { email },
@@ -158,7 +156,7 @@ const login = async (req, res) => {
     });
     return res.status(200).json({ accessToken });
   } catch (err) {
-    return res.status(500).json({ error: "User confirmation failed. Error: " + err });
+    return res.status(500).json({ error: "User confirmation failed." });
   }
 };
 
