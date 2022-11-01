@@ -316,7 +316,6 @@ const controller = {
 
   createStripePaymentIntent: async (req, res) => {
     const { total, orderIds } = req.body;
-    let paymentIntent;
     const customer = await models.Customer.findOne({
       where: { email: req.user.email },
     });
@@ -326,7 +325,7 @@ const controller = {
       customerStripeId = await createStripeCustomer(req.user);
     }
     try {
-      paymentIntent = await stripe.paymentIntents.create({
+      const paymentIntent = await stripe.paymentIntents.create({
         customer: customerStripeId,
         amount: total,
         currency: "sgd",
@@ -337,16 +336,15 @@ const controller = {
         },
       });
       const paymentMethods = await getStripeCustomerPaymentMethods(customerStripeId);
+      return res.status(201).json({
+        clientSecret: paymentIntent.client_secret,
+        paymentMethods: paymentMethods,
+      });
     } catch (err) {
       return res.status(502).json({
         error: `Error creating stripe payment intent. ${err.message}`,
       });
     }
-
-    return res.status(201).json({
-      clientSecret: paymentIntent.client_secret,
-      paymentMethods: paymentMethods,
-    });
   },
 
   updatePaymentStatus: async (req, res) => {
