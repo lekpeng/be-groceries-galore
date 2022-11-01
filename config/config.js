@@ -17,7 +17,7 @@ module.exports = {
     dialect: "postgres",
     logging: false,
     pool: {
-      max: 2,
+      max: 1,
     },
   },
   production: {
