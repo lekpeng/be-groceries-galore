@@ -3,38 +3,44 @@ const { DataTypes } = require("sequelize");
 // This function will automatically receive as parameter the Sequelize connection object.
 module.exports = (sequelize) => {
   const Customer = sequelize.define("Customer", {
-    isConfirmed: {
+    stripeId: {
+      type: DataTypes.STRING,
+      defaultValue: "",
       allowNull: false,
+    },
+    isConfirmed: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+      allowNull: false,
     },
     name: {
-      allowNull: false,
       type: DataTypes.STRING,
+      allowNull: false,
     },
     email: {
-      allowNull: false,
       type: DataTypes.STRING,
+      allowNull: false,
       unique: true,
       validate: {
         is: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i,
       },
     },
     passwordHash: {
-      allowNull: false,
       type: DataTypes.STRING,
+      allowNull: false,
     },
     address: {
-      allowNull: false,
       type: DataTypes.STRING,
+      allowNull: false,
     },
     phoneNumber: {
-      allowNull: false,
       type: DataTypes.STRING,
+      allowNull: false,
     },
     refreshToken: {
-      allowNull: false,
       type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "",
     },
   });
   return Customer;

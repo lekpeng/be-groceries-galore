@@ -16,11 +16,4 @@ router.post("/refresh-token", tokenController.refreshAccessToken);
 router.get("/profiles/:userType", profileController.index);
 router.get("/profiles/:userType/:email", profileController.show);
 
-router.get(
-  "/customers-only",
-  verifyAuthJwt,
-  verifyUserType("Customer"),
-  userController.customersOnly
-);
-
 module.exports = router;

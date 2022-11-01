@@ -84,7 +84,6 @@ const register = async (req, res) => {
     passwordHash,
     address,
     phoneNumber,
-    refreshToken: "",
   };
   try {
     await models[userType].create(userDetails);
@@ -192,8 +191,4 @@ const logout = async (req, res) => {
   return res.status(204).json();
 };
 
-const customersOnly = async (req, res) => {
-  return res.status(200).json({ hey: "you are in customers only route" });
-};
-
-module.exports = { sendConfirmationEmail, confirm, register, login, logout, customersOnly };
+module.exports = { sendConfirmationEmail, confirm, register, login, logout };

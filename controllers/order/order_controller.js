@@ -1,5 +1,6 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const models = require("../../models");
+const customer = require("../../models/customer");
 
 const getCustomerWithCartInfo = async (email) => {
   const customer = await models.Customer.findOne({
@@ -65,6 +66,30 @@ const updateOrderDetailsBasedOnStock = async (cart) => {
     }
   }
   return productsRemoved;
+};
+
+const getStripeCustomerPaymentMethods = async (stripeId) => {
+  const paymentMethods = await stripe.customers.listPaymentMethods(stripeId, { type: "card" });
+
+  return paymentMethods.data;
+};
+
+const createStripeCustomer = async ({ name, email }) => {
+  const stripeCustomer = await stripe.customers.create({
+    email,
+    name,
+  });
+  // also save in DB
+  await models.Customer.update(
+    {
+      stripeId: stripeCustomer.id,
+    },
+    {
+      where: { email },
+    }
+  );
+
+  return stripeCustomer.id;
 };
 
 const controller = {
@@ -134,15 +159,6 @@ const controller = {
     }
   },
 
-  // create: async (req, res) => {
-  //   const { order } = req.body;
-  //   try {
-  //     models.Order.create(order);
-  //     return res.status(201).json({});
-  //   } catch (err) {
-  //     return res.status(500).json({ error: err });
-  //   }
-  // },
   addItem: async (req, res) => {
     const customerWithCartInfo = await getCustomerWithCartInfo(req.user.email);
     const cart = await getCustomerCart(req.user.email);
@@ -291,8 +307,6 @@ const controller = {
     }
 
     try {
-      console.log("-----IN SECOND TRY BLOCK------");
-
       const updatedCart = await getCustomerCart(req.user.email);
       return res.status(200).json({ updatedCart, removedProducts });
     } catch (err) {
@@ -301,22 +315,37 @@ const controller = {
   },
 
   createStripePaymentIntent: async (req, res) => {
-    const total = req.body.total;
+    const { total, orderIds } = req.body;
     let paymentIntent;
+    const customer = await models.Customer.findOne({
+      where: { email: req.user.email },
+    });
 
+    let customerStripeId = customer.stripeId;
+    if (customer.stripeId === "") {
+      customerStripeId = await createStripeCustomer(req.user);
+    }
     try {
       paymentIntent = await stripe.paymentIntents.create({
+        customer: customerStripeId,
         amount: total,
         currency: "sgd",
+        metadata: { orderIds: orderIds.toString() },
+        setup_future_usage: "on_session",
+        automatic_payment_methods: {
+          enabled: true,
+        },
       });
+      const paymentMethods = await getStripeCustomerPaymentMethods(customerStripeId);
     } catch (err) {
       return res.status(502).json({
-        error: `Error creating stripe payment intent.`,
+        error: `Error creating stripe payment intent. ${err.message}`,
       });
     }
 
     return res.status(201).json({
       clientSecret: paymentIntent.client_secret,
+      paymentMethods: paymentMethods,
     });
   },
 

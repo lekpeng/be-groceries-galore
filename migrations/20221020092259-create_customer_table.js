@@ -10,6 +10,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      stripeId: {
+        type: Sequelize.STRING,
+        defaultValue: "",
+        allowNull: false,
+      },
       isConfirmed: {
         allowNull: false,
         type: Sequelize.BOOLEAN,
