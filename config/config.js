@@ -20,7 +20,7 @@ module.exports = {
       max: 2,
     },
   },
-  test: {
+  production: {
     username: process.env.PG_USERNAME,
     password: process.env.PG_PASSWORD,
     database: process.env.PG_DATABASE,
