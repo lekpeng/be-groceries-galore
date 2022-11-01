@@ -16,6 +16,9 @@ module.exports = {
     host: process.env.PG_HOST,
     dialect: "postgres",
     logging: false,
+    pool: {
+      max: 2,
+    },
   },
   test: {
     username: process.env.PG_USERNAME,

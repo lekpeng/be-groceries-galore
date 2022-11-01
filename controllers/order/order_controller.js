@@ -352,7 +352,7 @@ const controller = {
       );
     } catch (err) {
       return res.status(500).json({
-        error: `Error updating product stock.`,
+        error: `Error updating product stock. ${err.message}`,
       });
     }
     return res.status(200).json({});
