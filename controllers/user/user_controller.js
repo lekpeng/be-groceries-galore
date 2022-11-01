@@ -84,6 +84,7 @@ const register = async (req, res) => {
     passwordHash,
     address,
     phoneNumber,
+    refreshToken: "",
   };
   try {
     await models[userType].create(userDetails);
