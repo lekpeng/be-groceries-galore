@@ -1,6 +1,7 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const models = require("../../models");
 const customer = require("../../models/customer");
+const order = require("../../models/order");
 
 const getCustomerWithCartInfo = async (email) => {
   const customer = await models.Customer.findOne({
@@ -113,7 +114,7 @@ const controller = {
                   include: [{ model: models.Product }],
                 },
                 {
-                  model: models.Merchant,
+                  model: models.Customer,
                   attributes: ["name"],
                 },
               ],
@@ -140,7 +141,7 @@ const controller = {
                   include: [{ model: models.Product }],
                 },
                 {
-                  model: models.Merchant,
+                  model: models.Customer,
                   attributes: ["name"],
                 },
               ],
@@ -156,6 +157,41 @@ const controller = {
       return res.status(200).json({ orders: user.Orders });
     } catch (err) {
       return res.status(500).json({ error: "Failed to get orders." });
+    }
+  },
+
+  show: async (req, res) => {
+    const { email } = req.user;
+    const orderId = req.params.orderId;
+
+    console.log("ORDERID", orderId);
+
+    try {
+      const order = await models.Order.findOne({
+        where: { id: orderId },
+        include: [
+          {
+            model: models.OrderDetail,
+            include: [{ model: models.Product }],
+          },
+          {
+            model: models.Customer,
+            attributes: ["name", "email"],
+          },
+          {
+            model: models.Merchant,
+            attributes: ["name", "email"],
+          },
+        ],
+      });
+      console.log("ORDER", order);
+      if (!order || (order.Customer.email !== email && order.Merchant.email !== email)) {
+        return res.status(404).json({ error: "Order not found!" });
+      }
+
+      return res.status(200).json({ order });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
     }
   },
 
@@ -219,7 +255,7 @@ const controller = {
           );
         } catch (err) {
           return res.status(500).json({
-            error: `Error adding item - existing product with merchant in cart.`,
+            error: `Error adding item - existing product with merchant in cart. ${err.message}`,
           });
         }
       }
@@ -272,7 +308,7 @@ const controller = {
           });
         } catch (err) {
           return res.status(500).json({
-            error: `Error removing item - no further product with merchant.`,
+            error: `Error removing item - no further product with merchant. ${err.message}`,
           });
         }
       } else {
@@ -284,7 +320,7 @@ const controller = {
           });
         } catch (err) {
           return res.status(500).json({
-            error: `Error removing item - existing other product with merchant in cart.`,
+            error: `Error removing item - existing other product with merchant in cart. ${err.message}`,
           });
         }
       }
@@ -303,14 +339,14 @@ const controller = {
         return res.status(200).json({ updatedCart: cart, removedProducts });
       }
     } catch (err) {
-      return res.status(500).json({ error: `Failed to update order details based on stock.` });
+      return res.status(500).json({ error: `Failed to update order details based on stock. ${err.message}` });
     }
 
     try {
       const updatedCart = await getCustomerCart(req.user.email);
       return res.status(200).json({ updatedCart, removedProducts });
     } catch (err) {
-      return res.status(500).json({ error: `Failed to get updated cart.` });
+      return res.status(500).json({ error: `Failed to get updated cart. ${err.message}` });
     }
   },
 
@@ -360,7 +396,7 @@ const controller = {
       );
     } catch (err) {
       return res.status(500).json({
-        error: `Error updating payment status.`,
+        error: `Error updating payment status. ${err.message}`,
       });
     }
 

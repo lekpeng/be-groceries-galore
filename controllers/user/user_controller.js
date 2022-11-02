@@ -53,7 +53,7 @@ const confirm = async (req, res) => {
     );
     return res.status(200).json();
   } catch (err) {
-    return res.status(500).json({ error: "User confirmation failed. Error: " + err });
+    return res.status(500).json({ error: "User confirmation failed. Error: " + err.message });
   }
 };
 
@@ -88,7 +88,7 @@ const register = async (req, res) => {
   try {
     await models[userType].create(userDetails);
   } catch (err) {
-    return res.status(500).json({ error: "Failed to add user to DB" });
+    return res.status(500).json({ error: "Failed to add user to DB. " + err.message });
   }
 
   // send confirmation email

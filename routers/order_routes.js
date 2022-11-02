@@ -5,6 +5,7 @@ const verifyUserType = require("../middleware/verify_user_type");
 const order = require("../models/order");
 
 router.get("/", verifyAuthJwt, orderController.index);
+router.get("/:orderId", verifyAuthJwt, orderController.show);
 
 // cart-related
 router.get("/cart", verifyAuthJwt, verifyUserType("Customer"), orderController.index);

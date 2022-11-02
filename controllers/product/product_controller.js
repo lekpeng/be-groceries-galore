@@ -11,7 +11,7 @@ const controller = {
       });
       return res.status(200).json({ products });
     } catch (err) {
-      return res.status(500).json({ error: err });
+      return res.status(500).json({ error: `Failed to get orders ${err.message}` });
     }
   },
   show: async (req, res) => {
@@ -29,7 +29,7 @@ const controller = {
       }
       return res.status(200).json({ product });
     } catch (err) {
-      return res.status(500).json({ error: err });
+      return res.status(500).json({ error: `Failed to get product. ${err.message}` });
     }
   },
   create: async (req, res) => {

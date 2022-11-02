@@ -11,7 +11,7 @@ const controller = {
       });
       return res.status(200).json({ [userType]: users });
     } catch (err) {
-      return res.status(500).json({ error: "Failed to get profiles." });
+      return res.status(500).json({ error: `Failed to get profiles. ${err.message}` });
     }
   },
   show: async (req, res) => {
@@ -28,7 +28,7 @@ const controller = {
       }
       return res.status(200).json({ userProfile });
     } catch (err) {
-      return res.status(500).json({ error: "Failed to get profile." });
+      return res.status(500).json({ error: `Failed to get profile. ${err.message}` });
     }
   },
 };
