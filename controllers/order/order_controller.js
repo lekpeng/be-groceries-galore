@@ -1,7 +1,5 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const models = require("../../models");
-const customer = require("../../models/customer");
-const order = require("../../models/order");
 
 const getCustomerWithCartInfo = async (email) => {
   const customer = await models.Customer.findOne({
@@ -141,7 +139,7 @@ const controller = {
                   include: [{ model: models.Product }],
                 },
                 {
-                  model: models.Customer,
+                  model: models.Merchant,
                   attributes: ["name"],
                 },
               ],
@@ -192,6 +190,24 @@ const controller = {
       return res.status(200).json({ order });
     } catch (err) {
       return res.status(500).json({ error: err.message });
+    }
+  },
+
+  updateStatus: async (req, res) => {
+    const orderId = req.params.orderId;
+    console.log("ORDER ID BACKEND", orderId);
+    try {
+      await models.Order.update(
+        {
+          status: req.body.status,
+        },
+        {
+          where: { id: orderId },
+        }
+      );
+      return res.status(200).json({});
+    } catch (err) {
+      return res.status(500).json({ error: `Failed to update order status. ${err.message}` });
     }
   },
 
@@ -391,7 +407,7 @@ const controller = {
     try {
       await Promise.all(
         cart.map(async (order) => {
-          await order.update({ isPaid: true });
+          await order.update({ isPaid: true, status: "preparing" });
         })
       );
     } catch (err) {

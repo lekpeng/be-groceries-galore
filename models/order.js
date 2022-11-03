@@ -20,6 +20,7 @@ module.exports = (sequelize) => {
     status: {
       allowNull: false,
       type: DataTypes.STRING,
+      defaultValue: "cart",
     },
   });
 

@@ -24,6 +24,7 @@ module.exports = {
       status: {
         allowNull: false,
         type: Sequelize.STRING,
+        defaultValue: "cart",
       },
       createdAt: {
         allowNull: false,

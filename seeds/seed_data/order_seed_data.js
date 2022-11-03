@@ -15,14 +15,12 @@ const orders = [
   },
   {
     deliveryAddress: "4 Privet Drive, Little Whinging",
-    status: "",
     CustomerId: 1,
     MerchantId: 3,
   },
 
   {
     deliveryAddress: "4 Privet Drive, Little Whinging",
-    status: "",
     CustomerId: 1,
     MerchantId: 2,
   },
