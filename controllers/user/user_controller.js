@@ -110,7 +110,7 @@ const login = async (req, res) => {
   const { formData, userType } = req.body;
   const { email, password } = formData;
 
-  let errorMsg = `Email or password is incorrect. Did you mean to login as a ${otherUserType(userType)} user?`;
+  let errorMsg = `Email or password is incorrect.\nDid you mean to login as a ${otherUserType(userType)} user?`;
 
   const user = await models[userType].findOne({
     where: { email },
