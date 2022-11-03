@@ -148,10 +148,8 @@ const login = async (req, res) => {
     await user.update({ refreshToken });
 
     res.cookie("jwtRefreshToken", refreshToken, {
-      httpOnly: true,
       secure: true,
-      sameSite: "None",
-      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000,
     });
     return res.status(200).json({ accessToken });
@@ -167,7 +165,7 @@ const logout = async (req, res) => {
   if (!refreshToken) return res.status(204).json();
 
   // remove refresh token
-  res.clearCookie("jwtRefreshToken", { httpOnly: true, secure: true, sameSite: "None" });
+  res.clearCookie("jwtRefreshToken", { secure: true, sameSite: "none" });
   // verify refresh token (ignores expiry)
   let decodedRefreshToken = null;
   try {

@@ -33,7 +33,7 @@ const refreshAccessToken = async (req, res) => {
   try {
     decodedRefreshToken = jwt.verify(refreshToken, process.env.JWT_AUTH_REFRESH_SECRET);
   } catch (err) {
-    res.clearCookie("jwtRefreshToken", { httpOnly: true, secure: true, sameSite: "None" });
+    res.clearCookie("jwtRefreshToken", { secure: true, sameSite: "none" });
     return res.status(403).json({ error: "Invalid refresh token" });
   }
 
@@ -45,7 +45,7 @@ const refreshAccessToken = async (req, res) => {
 
   if (!user) {
     // remove token from cookie
-    res.clearCookie("jwtRefreshToken", { httpOnly: true, secure: true, sameSite: "None" });
+    res.clearCookie("jwtRefreshToken", { secure: true, sameSite: "none" });
     return res.status(403).json({
       error: "No user with matching refresh token.",
     });
@@ -53,7 +53,7 @@ const refreshAccessToken = async (req, res) => {
 
   // check whether the email of the user and the refresh token matches (tampering)
   if (user.email !== decodedRefreshToken.user.email) {
-    res.clearCookie("jwtRefreshToken", { httpOnly: true, secure: true, sameSite: "None" });
+    res.clearCookie("jwtRefreshToken", { secure: true, sameSite: "none" });
     return res.status(403).json({
       error: "Invalid refresh token",
     });
