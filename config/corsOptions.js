@@ -13,7 +13,7 @@ const corsOptions = {
   credentials: true,
   cookie: {
     sameSite: "none",
-    secure: "true",
+    secure: true,
   },
 };
 
