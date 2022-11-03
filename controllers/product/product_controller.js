@@ -1,17 +1,48 @@
 const models = require("../../models");
+const product_category = require("../../models/product_category");
 
 const controller = {
   index: async (req, res) => {
+    const query = req.query?.query?.toLowerCase();
     try {
-      const products = await models.Product.findAll({
+      let products = await models.Product.findAll({
         include: [
           { model: models.Merchant, attributes: ["name"] },
           { model: models.ProductCategory, attributes: ["name"] },
         ],
       });
+      if (query) {
+        console.log("QUERY");
+        products = products.filter((product) => {
+          return product.name.toLowerCase().includes(query);
+        });
+        console.log("QUERY PRODUCTS", products);
+      }
       return res.status(200).json({ products });
     } catch (err) {
       return res.status(500).json({ error: `Failed to get orders ${err.message}` });
+    }
+  },
+  indexByMerchant: async (req, res) => {
+    const merchantId = req.params.merchantId;
+    try {
+      const products = await models.Product.findAll({
+        where: {
+          MerchantId: merchantId,
+        },
+        include: [
+          { model: models.ProductCategory, attributes: ["name"] },
+          { model: models.Merchant, attributes: ["name"] },
+        ],
+      });
+      const merchant = await models.Merchant.findOne({
+        where: {
+          id: merchantId,
+        },
+      });
+      return res.status(200).json({ products, merchant });
+    } catch (err) {
+      return res.status(500).json({ error: `Failed to get products ${err.message}` });
     }
   },
   show: async (req, res) => {
