@@ -22,6 +22,10 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       defaultValue: "cart",
     },
+
+    paidAt: {
+      type: DataTypes.DATE,
+    },
   });
 
   return Order;

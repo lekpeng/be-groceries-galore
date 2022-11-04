@@ -9,7 +9,7 @@ const createEmailToken = (user) => {
 
 const createAccessToken = (user) => {
   return jwt.sign({ user }, process.env.JWT_AUTH_ACCESS_SECRET, {
-    expiresIn: "10s",
+    expiresIn: "10m",
   });
 };
 

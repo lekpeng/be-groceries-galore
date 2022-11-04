@@ -1,5 +1,4 @@
 const models = require("../../models");
-const product_category = require("../../models/product_category");
 
 const controller = {
   index: async (req, res) => {
@@ -12,11 +11,9 @@ const controller = {
         ],
       });
       if (query) {
-        console.log("QUERY");
         products = products.filter((product) => {
           return product.name.toLowerCase().includes(query);
         });
-        console.log("QUERY PRODUCTS", products);
       }
       return res.status(200).json({ products });
     } catch (err) {
@@ -63,14 +60,17 @@ const controller = {
       return res.status(500).json({ error: `Failed to get product. ${err.message}` });
     }
   },
-  create: async (req, res) => {
-    const { product } = req.body;
-    try {
-      models.Product.create(product);
-      return res.status(201).json({});
-    } catch (err) {
-      return res.status(500).json({});
-    }
+  create: async (req, res, next) => {
+    console.log("IN CREATE");
+    console.log("REQ BODY", req.body);
+    // const { product } = req.body;
+    // try {
+    //   models.Product.create(product);
+    //   return res.status(201).json({});
+    // } catch (err) {
+    //   return res.status(500).json({});
+    // }
+    next();
   },
 };
 

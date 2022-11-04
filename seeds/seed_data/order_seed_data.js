@@ -1,3 +1,5 @@
+const { Sequelize } = require("sequelize");
+
 const orders = [
   {
     isPaid: true,
@@ -5,6 +7,7 @@ const orders = [
     status: "packing",
     CustomerId: 1,
     MerchantId: 1,
+    paidAt: Sequelize.fn("now"),
   },
   {
     isPaid: true,
@@ -12,6 +15,7 @@ const orders = [
     status: "shipping",
     CustomerId: 1,
     MerchantId: 2,
+    paidAt: Sequelize.fn("now"),
   },
   {
     deliveryAddress: "4 Privet Drive, Little Whinging",

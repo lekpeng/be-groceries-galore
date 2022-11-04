@@ -1,5 +1,6 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const models = require("../../models");
+const { Sequelize } = require("sequelize");
 
 const getCustomerWithCartInfo = async (email) => {
   const customer = await models.Customer.findOne({
@@ -113,7 +114,7 @@ const controller = {
                 },
                 {
                   model: models.Customer,
-                  attributes: ["name"],
+                  attributes: ["name", "email"],
                 },
               ],
             },
@@ -162,8 +163,6 @@ const controller = {
     const { email } = req.user;
     const orderId = req.params.orderId;
 
-    console.log("ORDERID", orderId);
-
     try {
       const order = await models.Order.findOne({
         where: { id: orderId },
@@ -182,7 +181,6 @@ const controller = {
           },
         ],
       });
-      console.log("ORDER", order);
       if (!order || (order.Customer.email !== email && order.Merchant.email !== email)) {
         return res.status(404).json({ error: "Order not found!" });
       }
@@ -195,7 +193,6 @@ const controller = {
 
   updateStatus: async (req, res) => {
     const orderId = req.params.orderId;
-    console.log("ORDER ID BACKEND", orderId);
     try {
       await models.Order.update(
         {
@@ -407,7 +404,7 @@ const controller = {
     try {
       await Promise.all(
         cart.map(async (order) => {
-          await order.update({ isPaid: true, status: "preparing" });
+          await order.update({ isPaid: true, status: "preparing", paidAt: Sequelize.fn("now") });
         })
       );
     } catch (err) {
@@ -434,6 +431,7 @@ const controller = {
         error: `Error updating product stock. ${err.message}`,
       });
     }
+
     return res.status(200).json({});
   },
 };

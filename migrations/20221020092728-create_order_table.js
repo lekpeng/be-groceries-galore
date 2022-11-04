@@ -34,6 +34,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+      paidAt: {
+        type: Sequelize.DATE,
+      },
     });
   },
 
