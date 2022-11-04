@@ -16,5 +16,6 @@ router.post(
   productController.create
 );
 router.delete("/:productId", verifyAuthJwt, verifyUserType("Merchant"), productController.delete);
+router.patch("/:productId", verifyAuthJwt, verifyUserType("Merchant"), productController.update);
 
 module.exports = router;

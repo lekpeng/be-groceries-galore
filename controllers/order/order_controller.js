@@ -99,7 +99,6 @@ const controller = {
 
     try {
       if (userType === "Merchant") {
-        console.log("IN IF");
         user = await models[userType].findOne({
           where: {
             email,

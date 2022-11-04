@@ -97,6 +97,23 @@ const controller = {
       return res.status(500).json({ error: `Failed to delete product with id ${productId}. ${err.message}` });
     }
   },
+  update: async (req, res) => {
+    const { productId } = req.params;
+    const { field, value } = req.body;
+    try {
+      await models.Product.update(
+        {
+          [field]: req.body.value,
+        },
+        {
+          where: { id: productId },
+        }
+      );
+      return res.status(200).json({});
+    } catch (err) {
+      return res.status(500).json({ error: `Failed to update ${field}. ${err.message}` });
+    }
+  },
 };
 
 module.exports = controller;
