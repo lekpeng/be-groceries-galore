@@ -99,6 +99,7 @@ const controller = {
 
     try {
       if (userType === "Merchant") {
+        console.log("IN IF");
         user = await models[userType].findOne({
           where: {
             email,
@@ -106,7 +107,10 @@ const controller = {
           include: [
             {
               model: models.Order,
-              require: false,
+              where: {
+                isPaid: true,
+              },
+              required: false,
               include: [
                 {
                   model: models.OrderDetail,
