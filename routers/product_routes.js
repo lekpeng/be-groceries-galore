@@ -6,6 +6,7 @@ const imageUploader = require("../middleware/image_uploading");
 
 router.get("/", productController.index);
 router.get("/store/:merchantId", productController.indexByMerchant);
+router.get("/category/:categoryName", productController.indexByCategory);
 router.get("/:productId", productController.show);
 router.post(
   "/new",

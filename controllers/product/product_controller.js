@@ -42,6 +42,33 @@ const controller = {
       return res.status(500).json({ error: `Failed to get products ${err.message}` });
     }
   },
+  indexByCategory: async (req, res) => {
+    const categoryName = req.params.categoryName;
+    console.log("CATEGORY NAME", categoryName, "hmm");
+    try {
+      const productCategory = await models.ProductCategory.findOne({
+        where: {
+          name: categoryName,
+        },
+      });
+      console.log("PRODUCT CAT", productCategory);
+      const products = await models.Product.findAll({
+        where: {
+          ProductCategoryId: productCategory.id,
+        },
+        required: false,
+        include: [
+          { model: models.ProductCategory, attributes: ["name"] },
+          { model: models.Merchant, attributes: ["name", "email"] },
+        ],
+      });
+
+      return res.status(200).json({ products });
+    } catch (err) {
+      console.log("ERR", err.message);
+      return res.status(500).json({ error: `Failed to get products by category ${err.message}` });
+    }
+  },
   show: async (req, res) => {
     const { productId } = req.params;
     try {

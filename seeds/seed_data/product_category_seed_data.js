@@ -9,7 +9,7 @@ const productCategories = [
   { name: "Health & Wellness" },
   { name: "Meat & Seafood" },
   { name: "Rice, Noodles & Cooking Ingredients" },
-  { name: "Snacks and Confectionary " },
+  { name: "Snacks and Confectionary" },
 ];
 
 module.exports = productCategories;
