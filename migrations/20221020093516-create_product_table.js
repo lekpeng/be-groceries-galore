@@ -10,11 +10,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      isInView: {
-        allowNull: false,
-        type: Sequelize.BOOLEAN,
-        defaultValue: true,
-      },
+      // isInView: {
+      //   allowNull: false,
+      //   type: Sequelize.BOOLEAN,
+      //   defaultValue: true,
+      // },
       name: {
         allowNull: false,
         type: Sequelize.STRING,
@@ -45,6 +45,10 @@ module.exports = {
       },
       updatedAt: {
         allowNull: false,
+        type: Sequelize.DATE,
+      },
+      deletedAt: {
+        allowNull: true,
         type: Sequelize.DATE,
       },
     });

@@ -15,5 +15,6 @@ router.post(
   imageUploader.uploadToCloudinary,
   productController.create
 );
+router.delete("/:productId", verifyAuthJwt, verifyUserType("Merchant"), productController.delete);
 
 module.exports = router;

@@ -110,7 +110,7 @@ const controller = {
               include: [
                 {
                   model: models.OrderDetail,
-                  include: [{ model: models.Product }],
+                  include: [{ model: models.Product, paranoid: false }],
                 },
                 {
                   model: models.Customer,
@@ -137,7 +137,7 @@ const controller = {
               include: [
                 {
                   model: models.OrderDetail,
-                  include: [{ model: models.Product }],
+                  include: [{ model: models.Product, paranoid: false }],
                 },
                 {
                   model: models.Merchant,
@@ -169,7 +169,7 @@ const controller = {
         include: [
           {
             model: models.OrderDetail,
-            include: [{ model: models.Product }],
+            include: [{ model: models.Product, paranoid: false }],
           },
           {
             model: models.Customer,

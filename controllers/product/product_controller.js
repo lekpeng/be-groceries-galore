@@ -85,6 +85,18 @@ const controller = {
       return res.status(500).json({ error: `Error creating product ${err}` });
     }
   },
+  delete: async (req, res) => {
+    const { productId } = req.params;
+    try {
+      await models.Product.destroy({
+        where: { id: productId },
+      });
+
+      return res.status(200).json({});
+    } catch (err) {
+      return res.status(500).json({ error: `Failed to delete product with id ${productId}. ${err.message}` });
+    }
+  },
 };
 
 module.exports = controller;
