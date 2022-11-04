@@ -3,7 +3,6 @@ const order_details = require("./order_detail");
 // We export a function that defines the model.
 // This function will automatically receive as parameter the Sequelize connection object.
 
-// status: "", "preparing", "shipping", "out on delivery", "delivered"
 module.exports = (sequelize) => {
   const Order = sequelize.define("Order", {
     isPaid: {

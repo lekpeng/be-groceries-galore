@@ -24,7 +24,7 @@ const getCustomerWithCartInfo = async (email) => {
           },
           {
             model: models.Merchant,
-            attributes: ["name"],
+            attributes: ["name", "email"],
           },
         ],
       },
@@ -141,7 +141,7 @@ const controller = {
                 },
                 {
                   model: models.Merchant,
-                  attributes: ["name"],
+                  attributes: ["name", "email"],
                 },
               ],
             },
@@ -404,7 +404,7 @@ const controller = {
     try {
       await Promise.all(
         cart.map(async (order) => {
-          await order.update({ isPaid: true, status: "preparing", paidAt: Sequelize.fn("now") });
+          await order.update({ isPaid: true, status: "Preparing", paidAt: Sequelize.fn("now") });
         })
       );
     } catch (err) {

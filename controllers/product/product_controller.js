@@ -6,7 +6,7 @@ const controller = {
     try {
       let products = await models.Product.findAll({
         include: [
-          { model: models.Merchant, attributes: ["name"] },
+          { model: models.Merchant, attributes: ["name", "email"] },
           { model: models.ProductCategory, attributes: ["name"] },
         ],
       });
@@ -29,7 +29,7 @@ const controller = {
         },
         include: [
           { model: models.ProductCategory, attributes: ["name"] },
-          { model: models.Merchant, attributes: ["name"] },
+          { model: models.Merchant, attributes: ["name", "email"] },
         ],
       });
       const merchant = await models.Merchant.findOne({
@@ -48,7 +48,7 @@ const controller = {
       const product = await models.Product.findOne({
         where: { id: productId },
         include: [
-          { model: models.Merchant, attributes: ["name"] },
+          { model: models.Merchant, attributes: ["name", "email"] },
           { model: models.ProductCategory, attributes: ["name"] },
         ],
       });
@@ -60,17 +60,30 @@ const controller = {
       return res.status(500).json({ error: `Failed to get product. ${err.message}` });
     }
   },
-  create: async (req, res, next) => {
-    console.log("IN CREATE");
-    console.log("REQ BODY", req.body);
-    // const { product } = req.body;
-    // try {
-    //   models.Product.create(product);
-    //   return res.status(201).json({});
-    // } catch (err) {
-    //   return res.status(500).json({});
-    // }
-    next();
+  create: async (req, res) => {
+    const { name, description, price, quantity, category } = JSON.parse(req.body.formData);
+    const imageUrl = req.productImageUrl;
+
+    try {
+      const productCategory = await models.ProductCategory.findOne({
+        where: { name: category },
+      });
+      const merchant = await models.Merchant.findOne({
+        where: { email: req.user.email },
+      });
+      const newProduct = await models.Product.create({
+        name,
+        description,
+        price,
+        quantity,
+        imageUrl,
+        MerchantId: merchant.id,
+        ProductCategoryId: productCategory.id,
+      });
+      return res.status(200).json({ product: newProduct });
+    } catch (err) {
+      return res.status(500).json({ error: `Error creating product ${err}` });
+    }
   },
 };
 

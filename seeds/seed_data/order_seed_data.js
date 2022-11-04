@@ -4,7 +4,7 @@ const orders = [
   {
     isPaid: true,
     deliveryAddress: "4 Privet Drive, Little Whinging",
-    status: "packing",
+    status: "Packing",
     CustomerId: 1,
     MerchantId: 1,
     paidAt: Sequelize.fn("now"),
@@ -12,7 +12,7 @@ const orders = [
   {
     isPaid: true,
     deliveryAddress: "4 Privet Drive, Little Whinging",
-    status: "shipping",
+    status: "Shipping",
     CustomerId: 1,
     MerchantId: 2,
     paidAt: Sequelize.fn("now"),

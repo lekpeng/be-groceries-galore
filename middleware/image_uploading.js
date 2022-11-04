@@ -8,36 +8,21 @@ cloudinary.config({
   api_secret: `${process.env.CLOUDINARY_API_SECRET}`,
 });
 
-const imageUploadingFunctions = {
+const imageUploader = {
   upload: multer(),
-  uploadToCloudinary: async (req, res) => {
+  uploadToCloudinary: (req, res, next) => {
     const file = req.file;
-    console.log("FILE", file);
 
     const cld_upload_stream = cloudinary.uploader.upload_stream(
       { folder: "products", filename_override: req.file.originalname, use_filename: true },
       (err, res) => {
-        console.log(res, err);
+        req.productImageUrl = res.secure_url;
+        next();
       }
     );
 
     streamifier.createReadStream(req.file.buffer).pipe(cld_upload_stream);
   },
 };
-// const upload = multer();
 
-// const uploadToCloudinary = async (req, res) => {
-//   const file = req.file;
-//   console.log("FILE", file);
-
-//   const cld_upload_stream = cloudinary.uploader.upload_stream(
-//     { folder: "products", filename_override: req.file.originalname, use_filename: true },
-//     (err, res) => {
-//       console.log(res, err);
-//     }
-//   );
-
-//   streamifier.createReadStream(req.file.buffer).pipe(cld_upload_stream);
-// };
-
-module.exports = imageUploadingFunctions;
+module.exports = imageUploader;
